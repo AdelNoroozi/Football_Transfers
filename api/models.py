@@ -18,7 +18,7 @@ class Team(models.Model):
     name = models.CharField(max_length=20)
     desc = models.TextField(max_length=500)
     league = models.CharField(max_length=20, choices=LEAGUE)
-    market_value = models.DecimalField(max_digits=13, decimal_places=2)
+    market_value = models.DecimalField(max_digits=13, decimal_places=2, null=True,blank=True)
     president = models.CharField(max_length=50)
     open_transfer_window = models.BooleanField(default=True)
     logo = models.ImageField(upload_to='logos/', null=True, blank=True)
@@ -277,7 +277,7 @@ class Player(models.Model):
              ('LM', 'Left Midfielder'),
              ('LW', 'Left Winger'),
              ('RW', 'Right Winger'),
-             ('ST', 'Striker'),)
+             ('ST', 'Striker'))
     name = models.CharField(max_length=20)
     desc = models.TextField(max_length=500)
     nationality = models.CharField(max_length=20, choices=COUNTRIES)
