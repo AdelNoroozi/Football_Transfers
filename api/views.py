@@ -45,7 +45,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['POST'])
     def transfer(self, request, pk=None):
-        if 'dest_team' in request.data:
+        try:
             player = Player.objects.get(id=pk)
             dest_team = request.data['dest_team']
             date = request.data['date']
@@ -57,6 +57,9 @@ class PlayerViewSet(viewsets.ModelViewSet):
             player.save()
             response = {'transfer created successfully'}
             return Response(response, status=status.HTTP_200_OK)
+        except:
+            response = {'bad data'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TransferViewSet(viewsets.ModelViewSet):

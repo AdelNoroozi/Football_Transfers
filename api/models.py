@@ -300,7 +300,7 @@ class Player(models.Model):
         MaxValueValidator(60),
         MinValueValidator(15)
     ])
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='players')
     post = models.CharField(max_length=20, choices=POSTS)
     picture = models.ImageField(upload_to='pictures/', null=True, blank=True)
 
@@ -310,8 +310,8 @@ class Player(models.Model):
 
 class Transfer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    former_club = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='former')
-    destination_club = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='dest')
+    former_club = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='out_transfers')
+    destination_club = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='in_transfers')
     date = models.DateField()
     cost = models.DecimalField(max_digits=11, decimal_places=2)
 
