@@ -315,9 +315,8 @@ class Transfer(models.Model):
     date = models.DateField()
     cost = models.DecimalField(max_digits=11, decimal_places=2)
 
-    class Meta:
-        unique_together = (('player', 'former_club', 'destination_club', 'date'),)
-        index_together = (('player', 'former_club', 'destination_club', 'date'),)
+    def __str__(self):
+        return '{0} from {1} to {2}'.format(self.player.name, self.former_club.name, self.destination_club.name)
 
 
 class Popularities(models.Model):

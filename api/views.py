@@ -43,6 +43,21 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
 
+    @action(detail=True, methods=['POST'])
+    def transfer(self, request, pk=None):
+        if 'dest_team' in request.data:
+            player = Player.objects.get(id=pk)
+            dest_team = request.data['dest_team']
+            date = request.data['date']
+            cost = request.data['cost']
+            transfer = Transfer.objects.create(player=player, former_club=player.team, destination_club_id=dest_team,
+                                               date=date, cost=cost)
+            serializer = TransferSerializer(transfer, many=False)
+            player.team = Team.objects.get(id=dest_team)
+            player.save()
+            response = {'transfer created successfully'}
+            return Response(response, status=status.HTTP_200_OK)
+
 
 class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
