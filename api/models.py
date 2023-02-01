@@ -18,13 +18,27 @@ class Team(models.Model):
     name = models.CharField(max_length=20)
     desc = models.TextField(max_length=500)
     league = models.CharField(max_length=20, choices=LEAGUE)
-    market_value = models.DecimalField(max_digits=13, decimal_places=2, null=True,blank=True)
+    market_value = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True)
     president = models.CharField(max_length=50)
     open_transfer_window = models.BooleanField(default=True)
     logo = models.ImageField(upload_to='logos/', null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def no_of_scores(self):
+        scores = Popularities.objects.filter(team=self)
+        return len(scores)
+
+    def avg_score(self):
+        sum = 0
+        scores = Popularities.objects.filter(team=self)
+        for score in scores:
+            sum += score.popularity
+        if len(scores) > 0:
+            return sum / len(scores)
+        else:
+            return 0
 
 
 class Player(models.Model):

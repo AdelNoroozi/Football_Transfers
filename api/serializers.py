@@ -6,7 +6,7 @@ from api.models import Team, Popularities, Transfer, Player
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'name', 'league', 'desc', 'president', 'market_value', 'open_transfer_window', 'logo')
+        fields = ('id', 'name', 'league', 'desc', 'president', 'market_value', 'open_transfer_window', 'logo', 'no_of_scores', 'avg_score')
 
 
 class PlayerSerializer(serializers.ModelSerializer):
