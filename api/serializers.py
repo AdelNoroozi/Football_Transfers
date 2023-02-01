@@ -14,7 +14,8 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ('id', 'name', 'nationality', 'desc', 'main_foot', 'age', 'team', 'post', 'picture')
+        fields = (
+            'id', 'name', 'nationality', 'desc', 'main_foot', 'age', 'market_value', 'team', 'post', 'picture')
 
 
 class PlayerMiniSerializer(serializers.ModelSerializer):
@@ -49,8 +50,8 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = (
-            'id', 'name', 'league', 'desc', 'president', 'market_value', 'open_transfer_window', 'logo', 'no_of_scores',
-            'avg_score', 'players', 'in_transfers', 'out_transfers')
+            'id', 'name', 'league', 'desc', 'president', 'get_value', 'avg_age', 'open_transfer_window', 'logo',
+            'no_of_scores', 'avg_score', 'players', 'in_transfers', 'out_transfers')
 
 
 class PopularitiesSerializer(serializers.ModelSerializer):

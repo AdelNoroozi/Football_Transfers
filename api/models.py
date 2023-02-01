@@ -18,7 +18,6 @@ class Team(models.Model):
     name = models.CharField(max_length=20)
     desc = models.TextField(max_length=500)
     league = models.CharField(max_length=20, choices=LEAGUE)
-    market_value = models.DecimalField(max_digits=13, decimal_places=2, null=True, blank=True)
     president = models.CharField(max_length=50)
     open_transfer_window = models.BooleanField(default=True)
     logo = models.ImageField(upload_to='logos/', null=True, blank=True)
@@ -37,6 +36,23 @@ class Team(models.Model):
             sum += score.popularity
         if len(scores) > 0:
             return sum / len(scores)
+        else:
+            return 0
+
+    def get_value(self):
+        sum = 0
+        players = Player.objects.filter(team=self)
+        for player in players:
+            sum += player.market_value
+        return sum
+
+    def avg_age(self):
+        sum = 0
+        players = Player.objects.filter(team=self)
+        for player in players:
+            sum += player.age
+        if len(players) > 0:
+            return sum / len(players)
         else:
             return 0
 
@@ -302,6 +318,7 @@ class Player(models.Model):
     ])
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='players')
     post = models.CharField(max_length=20, choices=POSTS)
+    market_value = models.DecimalField(max_digits=9, decimal_places=2)
     picture = models.ImageField(upload_to='pictures/', null=True, blank=True)
 
     def __str__(self):
