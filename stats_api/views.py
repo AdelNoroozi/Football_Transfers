@@ -4,8 +4,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, IsAuthenticated
 from rest_framework.response import Response
-from api.models import Team, Player, Transfer, Popularities
-from api.serializers import TeamSerializer, PlayerSerializer, TransferSerializer, PopularitiesSerializer, UserSerializer
+from stats_api.models import Team, Player, Transfer, Popularities
+from stats_api.serializers import TeamSerializer, PlayerSerializer, TransferSerializer, PopularitiesSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import TeamViewSet, TransferViewSet, PlayerViewSet, PopularitiesViewSet, UserViewSet
+from stats_api.views import TeamViewSet, TransferViewSet, PlayerViewSet, PopularitiesViewSet, UserViewSet
 
 router = routers.DefaultRouter()
 router.register('users', UserViewSet)

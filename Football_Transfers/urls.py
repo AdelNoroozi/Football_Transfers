@@ -17,10 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.authtoken.views import obtain_auth_token
 
-import api
+import stats_api
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
+    path('stats_api/', include('stats_api.urls')),
     path('login/', obtain_auth_token)
 ]

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from api.models import Team, Popularities, Transfer, Player
+from stats_api.models import Team, Popularities, Transfer, Player
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,9 +57,9 @@ class TransferOutSerializer(serializers.ModelSerializer):
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    players = PlayerMiniSerializer(many=True)
-    in_transfers = TransferInSerializer(many=True)
-    out_transfers = TransferOutSerializer(many=True)
+    players = PlayerMiniSerializer(many=True, required=False)
+    in_transfers = TransferInSerializer(many=True, required=False)
+    out_transfers = TransferOutSerializer(many=True, required=False)
 
     class Meta:
         model = Team
