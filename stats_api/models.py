@@ -1,9 +1,10 @@
 from datetime import datetime, date
 
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from accounts.models import User
 from utils.models import Country, City
 
 

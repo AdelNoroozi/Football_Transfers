@@ -17,7 +17,7 @@ class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (AllowAny,)
+    # permission_classes = (AllowAny,)
 
     # detail true means the methods will apply on a single team, else it will apply on the whole list
     @action(detail=True, methods=['POST'])
@@ -45,12 +45,12 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CustomPermissionClass(BasePermission):
-    def has_permission(self, request, view):
-        if request.method == 'GET':
-            return True
-        elif request.method == 'POST':
-            return bool(request.user and request.user.is_staff)
+# class CustomPermissionClass(BasePermission):
+#     def has_permission(self, request, view):
+#         if request.method == 'GET':
+#             return True
+#         elif request.method == 'POST':
+#             return bool(request.user and request.user.is_staff)
 
 
 class MatchViewSet(viewsets.ModelViewSet):
@@ -84,7 +84,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (CustomPermissionClass,)
+    # permission_classes = (CustomPermissionClass,)
 
     @action(detail=True, methods=['POST'], )
     def transfer(self, request, pk=None):
@@ -109,14 +109,14 @@ class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
     serializer_class = TransferSerializer
 
-    permission_classes = (IsAdminUser,)
+    # permission_classes = (IsAdminUser,)
 
 
 class PopularitiesViewSet(viewsets.ModelViewSet):
     queryset = Popularities.objects.all()
     serializer_class = PopularitiesSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAdminUser,)
+    # permission_classes = (IsAdminUser,)
 
     def update(self, request, *args, **kwargs):
         response = {'message': 'cant update inside relation'}

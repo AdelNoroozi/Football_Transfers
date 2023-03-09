@@ -138,4 +138,4 @@ class TeamSerializer(serializers.ModelSerializer):
 class PopularitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Popularities
-        fields = ('id', 'team', 'user', 'popularity')
+        fields = ('id', 'team', 'popularity')
