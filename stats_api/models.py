@@ -99,8 +99,8 @@ class Match(models.Model):
                       ('H', 'held'),)
     host_team = models.ForeignKey(Team, on_delete=models.RESTRICT, related_name='host_team_match')
     guest_team = models.ForeignKey(Team, on_delete=models.RESTRICT, related_name='guest_team_match')
-    host_team_goal_count = models.IntegerField()
-    guest_team_goal_count = models.IntegerField()
+    host_team_goal_count = models.IntegerField(blank=True, null=True)
+    guest_team_goal_count = models.IntegerField(blank=True, null=True)
     time = models.DateTimeField()
     tournament_season = models.ForeignKey(TournamentSeason, on_delete=models.RESTRICT, related_name='matches')
     status = models.CharField(max_length=10, choices=MATCH_STATUSES)
@@ -168,9 +168,9 @@ class Goal(models.Model):
                 return f'{self.scorer.name} for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
         else:
             if self.team == self.match.host_team:
-                return f'{self.scorer.name} og for {self.match.guest_team.name} VS {self.team} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+                return f'{self.scorer.name} og for {self} VS {self.match.guest_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
             else:
-                return f'{self.scorer.name} og for {self.match.host_team.name} VS {self.team} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+                return f'{self.scorer.name} og for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
 
 
 class Booking(models.Model):
@@ -178,6 +178,7 @@ class Booking(models.Model):
              ('Y', 'yellow'))
     player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='bookings')
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='bookings')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='bookings')
     time = models.CharField(max_length=10)
     card = models.CharField(max_length=10, choices=CARDS)
 
@@ -189,6 +190,7 @@ class Substitution(models.Model):
     time = models.CharField(max_length=10)
     in_player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='in_subs')
     out_player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='out_subs')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='subs')
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='subs')
 
     def __str__(self):
@@ -220,9 +222,9 @@ class PlayerMatchStats(models.Model):
 
     def __str__(self):
         if self.players_team == self.match.host_team:
-            return f'{self.player.name} for {self.players_team} VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+            return f'{self.player.name} performance for {self.players_team} VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
         else:
-            return f'{self.player.name} for {self.players_team} VS {self.match.host_team}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+            return f'{self.player.name} performance for {self.players_team} VS {self.match.host_team}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
 
 
 class TeamMatchStats(models.Model):
@@ -240,9 +242,9 @@ class TeamMatchStats(models.Model):
 
     def __str__(self):
         if self.team == self.match.host_team:
-            return f'{self.team.name} VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+            return f'{self.team.name} performance VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
         else:
-            return f'{self.team.name} VS {self.match.host_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+            return f'{self.team.name} performance VS {self.match.host_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
 
 
 class Transfer(models.Model):

@@ -4,8 +4,8 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, IsAuthenticated
 from rest_framework.response import Response
-from stats_api.models import Team, Player, Transfer, Popularities
-from stats_api.serializers import TeamSerializer, PlayerSerializer, TransferSerializer, PopularitiesSerializer, UserSerializer
+from stats_api.models import Team, Player, Transfer, Popularities, Match
+from stats_api.serializers import *
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -53,6 +53,33 @@ class CustomPermissionClass(BasePermission):
             return bool(request.user and request.user.is_staff)
 
 
+class MatchViewSet(viewsets.ModelViewSet):
+    serializer_class = MatchSerializer
+    queryset = Match.objects.all()
+
+    @action(detail=True, methods=['GET'])
+    def event_line(self, request, pk=None):
+        try:
+            match = Match.objects.get(id=pk)
+        except:
+            response = {'message': 'match_not_found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = MatchEventsSerializer(match)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['GET'])
+    def stats(self, request, pk=None):
+        try:
+            match = Match.objects.get(id=pk)
+        except:
+            response = {'message': 'match_not_found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            serializer = MatchStatsSerializer(match)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
@@ -93,8 +120,8 @@ class PopularitiesViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         response = {'message': 'cant update inside relation'}
-        return Response(response,status=status.HTTP_400_BAD_REQUEST)
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         response = {'message': 'cant create inside relation'}
-        return Response(response,status=status.HTTP_400_BAD_REQUEST)
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
