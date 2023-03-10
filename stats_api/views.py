@@ -4,19 +4,24 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser, BasePermission, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from ai.algorithms import calculater_player_score
 from stats_api.models import Team, Player, Transfer, Popularities, Match
 from stats_api.serializers import *
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+#
+# class UserViewSet(viewsets.ModelViewSet):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = TeamSerializer
     authentication_classes = (TokenAuthentication,)
+
     # permission_classes = (AllowAny,)
 
     # detail true means the methods will apply on a single team, else it will apply on the whole list
@@ -84,6 +89,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     serializer_class = PlayerSerializer
     authentication_classes = (TokenAuthentication,)
+
     # permission_classes = (CustomPermissionClass,)
 
     @action(detail=True, methods=['POST'], )
@@ -105,6 +111,58 @@ class PlayerViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CreatePlayerMatchStatsView(APIView):
+    serializers = PlayerMatchStatsSerializer
+
+    def post(self, request):
+        player_id = request.data['player_id']
+        match_id = request.data['match_id']
+        try:
+            player = Player.objects.get(id=player_id)
+            match = Match.objects.get(id=match_id)
+        except:
+            response = {'match or player not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        saves = int(request.data['saves'])
+        passes = int(request.data['passes'])
+        complete_passes = int(request.data['complete_passes'])
+        dribbles = int(request.data['dribbles'])
+        blocks = int(request.data['blocks'])
+        interceptions = int(request.data['interceptions'])
+        key_passes = int(request.data['key_passes'])
+        shots = int(request.data['shots'])
+        shots_on_target = int(request.data['shots_on_target'])
+        chances_missed = int(request.data['chances_missed'])
+        post_hits = int(request.data['post_hits'])
+        shot_percentage = int((shots_on_target / shots) * 100)
+        complete_pass_percentage = int((complete_passes / passes)*100)
+        own_goals = Goal.objects.filter(is_og=True, match=match, scorer=player).count()
+        goals = Goal.objects.filter(is_og=False, match=match, scorer=player).count()
+        assists = Goal.objects.filter(is_og=False, match=match, assist_by=player).count()
+        yellow_cards = Booking.objects.filter(card='Y', match=match, player=player).count()
+        red_cards = Booking.objects.filter(card='R', match=match, player=player).count()
+        score = calculater_player_score(player, saves, passes, complete_passes, dribbles, blocks, interceptions,
+                                        key_passes,
+                                        shots_on_target, chances_missed, post_hits, goals, own_goals, assists,
+                                        yellow_cards,
+                                        red_cards)
+        player_match_stats = PlayerMatchStats.objects.create(player=player, match=match, players_team=player.team,
+                                                             saves=saves,
+                                                             passes=passes, complete_passes=complete_passes,
+                                                             dribbles=dribbles,
+                                                             blocks=blocks, interceptions=interceptions,
+                                                             key_passes=key_passes, shots=shots,
+                                                             shots_on_target=shots_on_target,
+                                                             chances_missed=chances_missed,
+                                                             post_hits=post_hits, shot_percentage=shot_percentage,
+                                                             complete_pass_percentage=complete_pass_percentage,
+                                                             own_goals=own_goals, goals=goals, assists=assists,
+                                                             yellow_cards=yellow_cards,
+                                                             red_cards=red_cards, score=score
+                                                             )
+        return Response({'asdfa': 'fdasf'}, status=status.HTTP_200_OK)
+
+
 class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
     serializer_class = TransferSerializer
@@ -116,6 +174,7 @@ class PopularitiesViewSet(viewsets.ModelViewSet):
     queryset = Popularities.objects.all()
     serializer_class = PopularitiesSerializer
     authentication_classes = (TokenAuthentication,)
+
     # permission_classes = (IsAdminUser,)
 
     def update(self, request, *args, **kwargs):

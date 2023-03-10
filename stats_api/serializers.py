@@ -111,6 +111,15 @@ class MatchStatsSerializer(serializers.ModelSerializer):
             'id', 'host_team', 'host_team_goal_count', 'team_match_stats')
 
 
+class PlayerMatchStatsSerializer(serializers.ModelSerializer):
+    player = serializers.CharField(source='player.name')
+
+    class Meta:
+        model = PlayerMatchStats
+        fields = (
+            'id', 'player')
+
+
 class TransferInSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfer

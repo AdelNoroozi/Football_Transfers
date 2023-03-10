@@ -121,6 +121,7 @@ class Player(models.Model):
              ('RB', 'Right Back'),
              ('CB', 'Center Back'),
              ('LB', 'Left Back'),
+             ('CDM', 'Center Defensive Midfielder'),
              ('CM', 'Center Midfielder'),
              ('RM', 'Right Midfielder'),
              ('LM', 'Left Midfielder'),
@@ -211,15 +212,17 @@ class PlayerMatchStats(models.Model):
     key_passes = models.IntegerField(default=0)
     shots = models.IntegerField(default=0)
     shots_on_target = models.IntegerField(default=0)
-    shot_percentage = models.IntegerField()
+    post_hits = models.IntegerField(default=0)
+    chances_missed = models.IntegerField(default=0)
     # the fields below should be saved using queries on other tables
+    shot_percentage = models.IntegerField()
     complete_pass_percentage = models.IntegerField()
     own_goals = models.IntegerField(default=0)
     goals = models.IntegerField(default=0)
     assists = models.IntegerField(default=0)
     yellow_cards = models.IntegerField(default=0)
     red_cards = models.IntegerField(default=0)
-    score = models.IntegerField(default=5)
+    score = models.DecimalField(default=5, max_digits=3, decimal_places=1)
 
     def __str__(self):
         if self.players_team == self.match.host_team:
