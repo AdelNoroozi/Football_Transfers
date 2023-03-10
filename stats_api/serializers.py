@@ -20,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TeamMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ('id', 'name', 'league', 'logo',)
+        fields = ('id', 'name', 'logo',)
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -29,13 +29,13 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = (
-            'id', 'name', 'nationality', 'desc', 'main_foot', 'age', 'market_value', 'team', 'post', 'picture')
+            'id', 'name', 'nationality', 'desc', 'main_foot', 'team', 'post', 'picture')
 
 
 class PlayerMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
-        fields = ('id', 'name', 'picture', 'age', 'post')
+        fields = ('id', 'name', 'picture', 'post')
 
 
 class TransferSerializer(serializers.ModelSerializer):
@@ -51,6 +51,14 @@ class MatchSerializer(serializers.ModelSerializer):
             'id', 'host_team', 'host_team_goal_count', 'guest_team', 'guest_team_goal_count', 'time',
             'tournament_season',
             'status', 'round', 'stadium', 'main_referee', 'assist_referees')
+
+
+class MatchMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = (
+            'id', 'id', 'host_team', 'guest_team', 'tournament_season', 'round'
+        )
 
 
 class GoalEventSerializer(serializers.ModelSerializer):
@@ -112,12 +120,18 @@ class MatchStatsSerializer(serializers.ModelSerializer):
 
 
 class PlayerMatchStatsSerializer(serializers.ModelSerializer):
-    player = serializers.CharField(source='player.name')
+    player = PlayerMiniSerializer(many=False)
+    players_team = TeamMiniSerializer(many=False)
+    match = MatchMiniSerializer(many=False)
 
     class Meta:
         model = PlayerMatchStats
         fields = (
-            'id', 'player')
+            'id', 'player', 'players_team', 'match', 'saves', 'passes', 'complete_passes', 'complete_pass_percentage',
+            'dribbles', 'blocks',
+            'interceptions', 'key_passes', 'shots', 'shots_on_target', 'shot_percentage', 'post_hits', 'chances_missed',
+            'own_goals', 'goals',
+            'assists', 'yellow_cards', 'red_cards', 'score')
 
 
 class TransferInSerializer(serializers.ModelSerializer):

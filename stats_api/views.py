@@ -112,7 +112,6 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
 
 class CreatePlayerMatchStatsView(APIView):
-    serializers = PlayerMatchStatsSerializer
 
     def post(self, request):
         player_id = request.data['player_id']
@@ -160,7 +159,8 @@ class CreatePlayerMatchStatsView(APIView):
                                                              yellow_cards=yellow_cards,
                                                              red_cards=red_cards, score=score
                                                              )
-        return Response({'asdfa': 'fdasf'}, status=status.HTTP_200_OK)
+        serializer = PlayerMatchStatsSerializer(player_match_stats)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class TransferViewSet(viewsets.ModelViewSet):

@@ -224,6 +224,9 @@ class PlayerMatchStats(models.Model):
     red_cards = models.IntegerField(default=0)
     score = models.DecimalField(default=5, max_digits=3, decimal_places=1)
 
+    class Meta:
+        unique_together = (('player', 'match'),)
+
     def __str__(self):
         if self.players_team == self.match.host_team:
             return f'{self.player.name} performance for {self.players_team} VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
