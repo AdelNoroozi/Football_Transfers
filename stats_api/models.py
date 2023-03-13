@@ -148,6 +148,11 @@ class Player(models.Model):
         return self.name
 
 
+class GoalType(models.Model):
+    type = models.CharField(max_length=20)
+    ratio = models.DecimalField(max_digits=3, decimal_places=2)
+
+
 class Goal(models.Model):
     AREAS = (('LF', 'left foot'),
              ('RF', 'right foot'),
@@ -161,6 +166,7 @@ class Goal(models.Model):
     time = models.CharField(max_length=10)
     body_area = models.CharField(max_length=15, choices=AREAS)
     is_og = models.BooleanField(default=False)
+    goal_type = models.ManyToManyField(GoalType)
 
     def __str__(self):
         if not self.is_og:
