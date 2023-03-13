@@ -129,6 +129,32 @@ class MatchViewSet(viewsets.ModelViewSet):
                     serializer = GoalSerializer(goal)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['POST'])
+    def submit_match_bookings(self, request, pk=None):
+        try:
+            match = Match.objects.get(id=pk)
+        except:
+            response = {'message': 'match_not_found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            player_id = request.data['player_id']
+            try:
+                player = Player.objects.get(id=player_id)
+            except:
+                response = {'player not found'}
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+            else:
+                try:
+                    time = request.data['time']
+                    card = request.data['card']
+                except:
+                    response = {'message': 'invalid fields or data'}
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    booking = Booking.objects.create(player=player, match=match, team=player.team, time=time, card=card)
+                    serializer = BookingEventSerializer(booking)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
