@@ -8,9 +8,10 @@ router = routers.DefaultRouter()
 router.register('teams', TeamViewSet)
 router.register('players', PlayerViewSet)
 router.register('matches', MatchViewSet)
-router.register('transfers', TransferViewSet)
-router.register('popularities', PopularitiesViewSet)
+# router.register('transfers', TransferViewSet)
+# router.register('popularities', PopularitiesViewSet)
 router.register('player_match_stats', PlayerMatchStatsListView)
+router.register('team_match_stats', TeamMatchStatsListView)
 
 urlpatterns = [
     path('', include(router.urls)),

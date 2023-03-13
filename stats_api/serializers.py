@@ -157,6 +157,16 @@ class PlayerMatchStatsMiniSerializer(serializers.ModelSerializer):
             'id', 'player', 'players_team', 'match', 'score')
 
 
+class TeamMatchStatsMiniSerializer(serializers.ModelSerializer):
+    team = TeamMiniSerializer
+    match = MatchMiniSerializer(many=False)
+
+    class Meta:
+        model = TeamMatchStats
+        fields = (
+            'id', 'team', 'match')
+
+
 class TransferInSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transfer

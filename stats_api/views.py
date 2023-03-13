@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from ai.algorithms import calculater_player_score
-from stats_api.filters import PlayerMatchStatsFilter
+from stats_api.filters import PlayerMatchStatsFilter, TeamMatchStatsFilter
 from stats_api.models import Team, Player, Transfer, Popularities, Match
 from stats_api.serializers import *
 
@@ -364,7 +364,7 @@ class PlayerMatchStatsListView(mixins.ListModelMixin,
                                GenericViewSet):
     queryset = PlayerMatchStats.objects.all()
     serializer_class = PlayerMatchStatsMiniSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = PlayerMatchStatsFilter
     ordering_fields = ['saves', 'passes', 'complete_passes', 'complete_pass_percentage',
                        'dribbles', 'blocks',
@@ -373,6 +373,15 @@ class PlayerMatchStatsListView(mixins.ListModelMixin,
                        'own_goals', 'goals',
                        'assists', 'yellow_cards', 'red_cards', 'score']
 
+
+class TeamMatchStatsListView(mixins.ListModelMixin,
+                             GenericViewSet):
+    queryset = TeamMatchStats.objects.all()
+    serializer_class = TeamMatchStatsMiniSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_class = TeamMatchStatsFilter
+    ordering_fields = ['complete_pass_percentage', 'shots', 'shots_on_target', 'shot_percentage', 'goals', 'possession',
+                       'corners', 'offsides']
 
 class TransferViewSet(viewsets.ModelViewSet):
     queryset = Transfer.objects.all()
