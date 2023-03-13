@@ -87,6 +87,48 @@ class MatchViewSet(viewsets.ModelViewSet):
             serializer = MatchStatsSerializer(match)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=['POST'])
+    def submit_match_goals(self, request, pk=None):
+        try:
+            match = Match.objects.get(id=pk)
+        except:
+            response = {'message': 'match_not_found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            scorer_id = request.data['scorer_id']
+            assistant_id = request.data['assistant_id']
+            try:
+                scorer = Player.objects.get(id=scorer_id)
+                assistant = Player.objects.get(id=assistant_id)
+            except:
+                response = {'scorer or assistant player not found'}
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+            else:
+                try:
+                    time = request.data['time']
+                    body_area = request.data['body_area']
+                    is_og = request.data['is_og']
+                except:
+                    response = {'message': 'invalid fields or data'}
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    if is_og == 'True':
+                        scorers_team = scorer.team
+                        if scorers_team == match.host_team:
+                            team = match.guest_team
+                        else:
+                            team = match.host_team
+                    elif is_og == 'False':
+                        team = scorer.team
+                    else:
+                        response = {'message': 'invalid fields or data'}
+                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                    goal = Goal.objects.create(match=match, scorer=scorer, assist_by=assistant, team=team,
+                                               time=time,
+                                               body_area=body_area, is_og=is_og)
+                    serializer = GoalSerializer(goal)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()

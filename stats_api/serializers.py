@@ -61,6 +61,16 @@ class MatchMiniSerializer(serializers.ModelSerializer):
         )
 
 
+class GoalSerializer(serializers.ModelSerializer):
+    scorer = PlayerMiniSerializer(many=False)
+    team = TeamMiniSerializer(many=False)
+    assist_by = PlayerMiniSerializer(many=False)
+
+    class Meta:
+        model = Goal
+        fields = ('id', 'team', 'scorer', 'assist_by', 'time', 'body_area', 'is_og')
+
+
 class GoalEventSerializer(serializers.ModelSerializer):
     scorer = serializers.CharField(source='scorer.name')
     team = serializers.CharField(source='team.name')
