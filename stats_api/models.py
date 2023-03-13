@@ -166,19 +166,16 @@ class Goal(models.Model):
     time = models.CharField(max_length=10)
     body_area = models.CharField(max_length=15, choices=AREAS)
     is_og = models.BooleanField(default=False)
-    goal_type = models.ManyToManyField(GoalType)
+    goal_type = models.ManyToManyField(GoalType, blank=True, null=True)
 
     def __str__(self):
-        if not self.is_og:
-            if self.team == self.match.host_team:
-                return f'{self.scorer.name} for {self.team} VS {self.match.guest_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
-            else:
-                return f'{self.scorer.name} for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+        og_string = ''
+        if self.is_og:
+            og_string = 'og'
+        if self.team == self.match.host_team:
+            return f'{self.scorer.name} {og_string} for {self.team} VS {self.match.guest_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
         else:
-            if self.team == self.match.host_team:
-                return f'{self.scorer.name} og for {self} VS {self.match.guest_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
-            else:
-                return f'{self.scorer.name} og for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+            return f'{self.scorer.name} {og_string} for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
 
 
 class Booking(models.Model):

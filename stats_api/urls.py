@@ -14,5 +14,6 @@ router.register('player_match_stats', PlayerMatchStatsListView)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('add_player_match_stats/', CreatePlayerMatchStatsView.as_view())
+    path('add_player_match_stats/', CreatePlayerMatchStatsView.as_view()),
+    path('add_team_match_stats/', CreateTeamMatchStatsView.as_view()),
 ]

@@ -111,12 +111,14 @@ class MatchEventsSerializer(serializers.ModelSerializer):
 
 
 class TeamMatchStatsSerializer(serializers.ModelSerializer):
-    team = serializers.CharField(source='team.name')
+    team = TeamMiniSerializer(many=False)
+    match = MatchMiniSerializer(many=False)
 
     class Meta:
         model = TeamMatchStats
         fields = (
-            'id', 'team', 'possession', 'corners', 'offsides', 'shots', 'shots_on_target', 'shot_percentage', 'goals',
+            'id', 'team', 'match', 'possession', 'corners', 'offsides', 'shots', 'shots_on_target', 'shot_percentage',
+            'goals',
             'complete_pass_percentage')
 
 

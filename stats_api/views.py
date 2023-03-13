@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import Sum, Avg
 from rest_framework import viewsets, status, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -197,7 +198,7 @@ class MatchViewSet(viewsets.ModelViewSet):
                         sub = Substitution.objects.create(match=match, in_player=in_player, out_player=out_player,
                                                           team=in_player.team, time=time)
                         serializer = SubEventSerializer(sub)
-                        return Response(serializer.data, status= status.HTTP_201_CREATED)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PlayerViewSet(viewsets.ModelViewSet):
@@ -229,74 +230,134 @@ class PlayerViewSet(viewsets.ModelViewSet):
 class CreatePlayerMatchStatsView(APIView):
 
     def post(self, request):
-        player_id = request.data['player_id']
-        match_id = request.data['match_id']
         try:
-            player = Player.objects.get(id=player_id)
-            match = Match.objects.get(id=match_id)
+            player_id = request.data['player_id']
+            match_id = request.data['match_id']
         except:
-            response = {'match or player not found'}
-            return Response(response, status=status.HTTP_404_NOT_FOUND)
+            response = {'message': 'invalid fields or data'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
         else:
             try:
-                saves = int(request.data['saves'])
-                passes = int(request.data['passes'])
-                complete_passes = int(request.data['complete_passes'])
-                dribbles = int(request.data['dribbles'])
-                blocks = int(request.data['blocks'])
-                interceptions = int(request.data['interceptions'])
-                key_passes = int(request.data['key_passes'])
-                shots = int(request.data['shots'])
-                shots_on_target = int(request.data['shots_on_target'])
-                chances_missed = int(request.data['chances_missed'])
-                post_hits = int(request.data['post_hits'])
+                player = Player.objects.get(id=player_id)
+                match = Match.objects.get(id=match_id)
             except:
-                response = {'message': 'invalid fields or data'}
-                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                response = {'match or player not found'}
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
             else:
-                shot_percentage = int((shots_on_target / shots) * 100)
-                complete_pass_percentage = int((complete_passes / passes) * 100)
-                own_goals = Goal.objects.filter(is_og=True, match=match, scorer=player).count()
-                goals = Goal.objects.filter(is_og=False, match=match, scorer=player).count()
-                assists = Goal.objects.filter(is_og=False, match=match, assist_by=player).count()
-                yellow_cards = Booking.objects.filter(card='Y', match=match, player=player).count()
-                red_cards = Booking.objects.filter(card='R', match=match, player=player).count()
-                score = calculater_player_score(player, saves, passes, complete_passes, dribbles, blocks, interceptions,
-                                                key_passes,
-                                                shots_on_target, chances_missed, post_hits, goals, own_goals, assists,
-                                                yellow_cards,
-                                                red_cards)
                 try:
-                    PlayerMatchStats.objects.get(player=player, match=match)
+                    saves = int(request.data['saves'])
+                    passes = int(request.data['passes'])
+                    complete_passes = int(request.data['complete_passes'])
+                    dribbles = int(request.data['dribbles'])
+                    blocks = int(request.data['blocks'])
+                    interceptions = int(request.data['interceptions'])
+                    key_passes = int(request.data['key_passes'])
+                    shots = int(request.data['shots'])
+                    shots_on_target = int(request.data['shots_on_target'])
+                    chances_missed = int(request.data['chances_missed'])
+                    post_hits = int(request.data['post_hits'])
                 except:
-                    if shots_on_target > shots or post_hits > shots:
-                        response = {'shots on target or post hits can not be more than shots'}
-                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-                    if complete_passes > passes:
-                        response = {'complete passes can not be more than passes'}
-                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
-                    player_match_stats = PlayerMatchStats.objects.create(player=player, match=match,
-                                                                         players_team=player.team,
-                                                                         saves=saves,
-                                                                         passes=passes, complete_passes=complete_passes,
-                                                                         dribbles=dribbles,
-                                                                         blocks=blocks, interceptions=interceptions,
-                                                                         key_passes=key_passes, shots=shots,
-                                                                         shots_on_target=shots_on_target,
-                                                                         chances_missed=chances_missed,
-                                                                         post_hits=post_hits,
-                                                                         shot_percentage=shot_percentage,
-                                                                         complete_pass_percentage=complete_pass_percentage,
-                                                                         own_goals=own_goals, goals=goals,
-                                                                         assists=assists,
-                                                                         yellow_cards=yellow_cards,
-                                                                         red_cards=red_cards, score=score
-                                                                         )
-                    serializer = PlayerMatchStatsSerializer(player_match_stats)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
-                else:
-                    response = {'stats already exist'}
+                    response = {'message': 'invalid fields or data'}
                     return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    shot_percentage = int((shots_on_target / shots) * 100)
+                    complete_pass_percentage = int((complete_passes / passes) * 100)
+                    own_goals = Goal.objects.filter(is_og=True, match=match, scorer=player).count()
+                    goals = Goal.objects.filter(is_og=False, match=match, scorer=player).count()
+                    assists = Goal.objects.filter(is_og=False, match=match, assist_by=player).count()
+                    yellow_cards = Booking.objects.filter(card='Y', match=match, player=player).count()
+                    red_cards = Booking.objects.filter(card='R', match=match, player=player).count()
+                    score = calculater_player_score(player, saves, passes, complete_passes, dribbles, blocks,
+                                                    interceptions,
+                                                    key_passes,
+                                                    shots_on_target, chances_missed, post_hits, goals, own_goals,
+                                                    assists,
+                                                    yellow_cards,
+                                                    red_cards)
+                    try:
+                        PlayerMatchStats.objects.get(player=player, match=match)
+                    except:
+                        if shots_on_target > shots or post_hits > shots:
+                            response = {'shots on target or post hits can not be more than shots'}
+                            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                        if complete_passes > passes:
+                            response = {'complete passes can not be more than passes'}
+                            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                        player_match_stats = PlayerMatchStats.objects.create(player=player, match=match,
+                                                                             players_team=player.team,
+                                                                             saves=saves,
+                                                                             passes=passes,
+                                                                             complete_passes=complete_passes,
+                                                                             dribbles=dribbles,
+                                                                             blocks=blocks, interceptions=interceptions,
+                                                                             key_passes=key_passes, shots=shots,
+                                                                             shots_on_target=shots_on_target,
+                                                                             chances_missed=chances_missed,
+                                                                             post_hits=post_hits,
+                                                                             shot_percentage=shot_percentage,
+                                                                             complete_pass_percentage=complete_pass_percentage,
+                                                                             own_goals=own_goals, goals=goals,
+                                                                             assists=assists,
+                                                                             yellow_cards=yellow_cards,
+                                                                             red_cards=red_cards, score=score
+                                                                             )
+                        serializer = PlayerMatchStatsSerializer(player_match_stats)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    else:
+                        response = {'stats already exist'}
+                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateTeamMatchStatsView(APIView):
+
+    def post(self, request):
+        try:
+            team_id = request.data['team_id']
+            match_id = request.data['match_id']
+        except:
+            response = {'message': 'invalid fields or data'}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                team = Team.objects.get(id=team_id)
+                match = Match.objects.get(id=match_id)
+            except:
+                response = {'match or player not found'}
+                return Response(response, status=status.HTTP_404_NOT_FOUND)
+            else:
+                try:
+                    possession = int(request.data['possession'])
+                    corners = int(request.data['corners'])
+                    offsides = int(request.data['offsides'])
+                except:
+                    response = {'message': 'invalid fields or data'}
+                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    try:
+                        TeamMatchStats.objects.get(team=team, match=match)
+                    except:
+                        shots = PlayerMatchStats.objects.filter(player__team=team, match=match).aggregate(Sum('shots'))
+                        shots_value = shots['shots__sum']
+                        shots_on_target = PlayerMatchStats.objects.filter(player__team=team, match=match).aggregate(
+                            Sum('shots_on_target'))
+                        shots_on_target_value = shots_on_target['shots_on_target__sum']
+                        shot_percentage = int((shots_on_target_value / shots_value) * 100)
+                        goals = Goal.objects.filter(team=team, match=match).count()
+                        complete_pass_percentage = PlayerMatchStats.objects.filter(player__team=team, match=match
+                                                                                   ).aggregate(
+                            Avg('complete_pass_percentage'))
+                        complete_pass_percentage_value = int(complete_pass_percentage['complete_pass_percentage__avg'])
+                        team_match_stats = TeamMatchStats.objects.create(team=team, match=match, possession=possession,
+                                                                         offsides=offsides,
+                                                                         corners=corners, shots=shots_value,
+                                                                         shots_on_target=shots_on_target_value,
+                                                                         shot_percentage=shot_percentage, goals=goals,
+                                                                         complete_pass_percentage=complete_pass_percentage_value)
+                        serializer = TeamMatchStatsSerializer(team_match_stats)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    else:
+                        response = {'stats already exist'}
+                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PlayerMatchStatsListView(mixins.ListModelMixin,
