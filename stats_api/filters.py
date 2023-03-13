@@ -15,3 +15,16 @@ class TeamMatchStatsFilter(FilterSet):
         model = TeamMatchStats
         fields = {'team': ['exact'],
                   'match': ['exact']}
+
+
+class GoalFilter(FilterSet):
+    class Meta:
+        model = Goal
+        fields = {'scorer': ['exact'],
+                  'match': ['exact'],
+                  'assist_by': ['exact'],
+                  'team': ['exact'],
+                  'body_area': ['exact'],
+                  'is_og': ['exact'],
+                  'goal_type': ['exact'],
+                  'time': ['gt', 'lt']}

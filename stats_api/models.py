@@ -150,7 +150,7 @@ class Player(models.Model):
 
 class GoalType(models.Model):
     type = models.CharField(max_length=20)
-    ratio = models.DecimalField(max_digits=3, decimal_places=2)
+    ratio = models.DecimalField(max_digits=3, decimal_places=2, default=1.00)
 
 
 class Goal(models.Model):

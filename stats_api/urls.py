@@ -12,6 +12,7 @@ router.register('matches', MatchViewSet)
 # router.register('popularities', PopularitiesViewSet)
 router.register('player_match_stats', PlayerMatchStatsListView)
 router.register('team_match_stats', TeamMatchStatsListView)
+router.register('goals', GoalListView)
 
 urlpatterns = [
     path('', include(router.urls)),
