@@ -95,39 +95,44 @@ class MatchViewSet(viewsets.ModelViewSet):
             response = {'message': 'match_not_found'}
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         else:
-            scorer_id = request.data['scorer_id']
-            assistant_id = request.data['assistant_id']
             try:
-                scorer = Player.objects.get(id=scorer_id)
-                assistant = Player.objects.get(id=assistant_id)
+                scorer_id = request.data['scorer_id']
+                assistant_id = request.data['assistant_id']
             except:
-                response = {'scorer or assistant player not found'}
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
+                response = {'message': 'invalid fields or data'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:
-                    time = request.data['time']
-                    body_area = request.data['body_area']
-                    is_og = request.data['is_og']
+                    scorer = Player.objects.get(id=scorer_id)
+                    assistant = Player.objects.get(id=assistant_id)
                 except:
-                    response = {'message': 'invalid fields or data'}
-                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                    response = {'scorer or assistant player not found'}
+                    return Response(response, status=status.HTTP_404_NOT_FOUND)
                 else:
-                    if is_og == 'True':
-                        scorers_team = scorer.team
-                        if scorers_team == match.host_team:
-                            team = match.guest_team
-                        else:
-                            team = match.host_team
-                    elif is_og == 'False':
-                        team = scorer.team
-                    else:
+                    try:
+                        time = request.data['time']
+                        body_area = request.data['body_area']
+                        is_og = request.data['is_og']
+                    except:
                         response = {'message': 'invalid fields or data'}
                         return Response(response, status=status.HTTP_400_BAD_REQUEST)
-                    goal = Goal.objects.create(match=match, scorer=scorer, assist_by=assistant, team=team,
-                                               time=time,
-                                               body_area=body_area, is_og=is_og)
-                    serializer = GoalSerializer(goal)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    else:
+                        if is_og == 'True':
+                            scorers_team = scorer.team
+                            if scorers_team == match.host_team:
+                                team = match.guest_team
+                            else:
+                                team = match.host_team
+                        elif is_og == 'False':
+                            team = scorer.team
+                        else:
+                            response = {'message': 'invalid fields or data'}
+                            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                        goal = Goal.objects.create(match=match, scorer=scorer, assist_by=assistant, team=team,
+                                                   time=time,
+                                                   body_area=body_area, is_og=is_og)
+                        serializer = GoalSerializer(goal)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
     def submit_match_bookings(self, request, pk=None):
@@ -137,23 +142,62 @@ class MatchViewSet(viewsets.ModelViewSet):
             response = {'message': 'match_not_found'}
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         else:
-            player_id = request.data['player_id']
             try:
-                player = Player.objects.get(id=player_id)
+                player_id = request.data['player_id']
             except:
-                response = {'player not found'}
-                return Response(response, status=status.HTTP_404_NOT_FOUND)
+                response = {'message': 'invalid fields or data'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
                 try:
-                    time = request.data['time']
-                    card = request.data['card']
+                    player = Player.objects.get(id=player_id)
                 except:
-                    response = {'message': 'invalid fields or data'}
-                    return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                    response = {'player not found'}
+                    return Response(response, status=status.HTTP_404_NOT_FOUND)
                 else:
-                    booking = Booking.objects.create(player=player, match=match, team=player.team, time=time, card=card)
-                    serializer = BookingEventSerializer(booking)
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    try:
+                        time = request.data['time']
+                        card = request.data['card']
+                    except:
+                        response = {'message': 'invalid fields or data'}
+                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        booking = Booking.objects.create(player=player, match=match, team=player.team, time=time,
+                                                         card=card)
+                        serializer = BookingEventSerializer(booking)
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['POST'])
+    def submit_match_substitutions(self, request, pk=None):
+        try:
+            match = Match.objects.get(id=pk)
+        except:
+            response = {'message': 'match_not_found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            try:
+                in_player_id = request.data['in_player_id']
+                out_player_id = request.data['out_player_id']
+            except:
+                response = {'message': 'invalid fields or data'}
+                return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                try:
+                    in_player = Player.objects.get(id=in_player_id)
+                    out_player = Player.objects.get(id=out_player_id)
+                except:
+                    response = {'player not found'}
+                    return Response(response, status=status.HTTP_404_NOT_FOUND)
+                else:
+                    try:
+                        time = request.data['time']
+                    except:
+                        response = {'message': 'invalid fields or data'}
+                        return Response(response, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        sub = Substitution.objects.create(match=match, in_player=in_player, out_player=out_player,
+                                                          team=in_player.team, time=time)
+                        serializer = SubEventSerializer(sub)
+                        return Response(serializer.data, status= status.HTTP_201_CREATED)
 
 
 class PlayerViewSet(viewsets.ModelViewSet):
