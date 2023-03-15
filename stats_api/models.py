@@ -166,7 +166,7 @@ class Goal(models.Model):
     time = models.CharField(max_length=10)
     body_area = models.CharField(max_length=15, choices=AREAS)
     is_og = models.BooleanField(default=False)
-    goal_type = models.ManyToManyField(GoalType, blank=True, null=True)
+    goal_type = models.ManyToManyField(GoalType, blank=True)
 
     def __str__(self):
         og_string = ''
@@ -255,6 +255,20 @@ class TeamMatchStats(models.Model):
             return f'{self.team.name} performance VS {self.match.guest_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
         else:
             return f'{self.team.name} performance VS {self.match.host_team.name}  ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
+
+
+class TeamTournamentStats(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='tables')
+    tournament_season = models.ForeignKey(TournamentSeason, on_delete=models.CASCADE, related_name='tables')
+    points = models.IntegerField(default=0)
+    wins = models.PositiveIntegerField(default=0)
+    loses = models.PositiveIntegerField(default=0)
+    draws = models.PositiveIntegerField(default=0)
+    goals_scored = models.PositiveIntegerField(default=0)
+    goals_received = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.team.name} - {self.tournament_season.tournament.name} - {self.tournament_season.season}'
 
 
 class Transfer(models.Model):
