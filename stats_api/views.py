@@ -200,6 +200,19 @@ class MatchViewSet(viewsets.ModelViewSet):
                         serializer = SubEventSerializer(sub)
                         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['PATCH'])
+    def finish_match(self, request, pk=None):
+        if not Match.objects.filter(id=pk).exists():
+            response = {'message': 'match not found'}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
+        else:
+            match = Match.objects.get(id=pk)
+            match.status = 'H'
+            match.save()
+            # table should be updated
+            response = {'message': 'match finished successfully'}
+            return Response(response, status=status.HTTP_200_OK)
+
 
 class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
