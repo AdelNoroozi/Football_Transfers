@@ -3,6 +3,7 @@ from datetime import datetime, date
 # from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Avg
 
 from accounts.models import User
 from utils.models import Country, City
@@ -177,6 +178,10 @@ class Goal(models.Model):
         else:
             return f'{self.scorer.name} {og_string} for {self.team} VS {self.match.host_team.name} - {self.time} ({self.match.tournament_season.tournament.name} {self.match.tournament_season.season} - {self.match.round})'
 
+    def get_goal_ratio(self):
+        avg_goal_ratio = self.goal_type.aggregate(Avg('ratio'))
+        return avg_goal_ratio['ratio__avg']
+
 
 class Booking(models.Model):
     CARDS = (('R', 'red'),
@@ -258,8 +263,9 @@ class TeamMatchStats(models.Model):
 
 
 class TeamTournamentStats(models.Model):
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='tables')
-    tournament_season = models.ForeignKey(TournamentSeason, on_delete=models.CASCADE, related_name='tables')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_tournament_stats')
+    tournament_season = models.ForeignKey(TournamentSeason, on_delete=models.CASCADE,
+                                          related_name='team_tournament_stats')
     points = models.IntegerField(default=0)
     wins = models.PositiveIntegerField(default=0)
     loses = models.PositiveIntegerField(default=0)

@@ -103,9 +103,15 @@ class MatchViewSet(viewsets.ModelViewSet):
                 response = {'message': 'invalid fields or data'}
                 return Response(response, status=status.HTTP_400_BAD_REQUEST)
             else:
+                if scorer_id == assistant_id:
+                    response = {'message': 'assistant and scorer can not be the same player'}
+                    return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
                 try:
                     scorer = Player.objects.get(id=scorer_id)
-                    assistant = Player.objects.get(id=assistant_id)
+                    if not assistant_id == 'None':
+                        assistant = Player.objects.get(id=assistant_id)
+                    else:
+                        assistant = None
                 except:
                     response = {'scorer or assistant player not found'}
                     return Response(response, status=status.HTTP_404_NOT_FOUND)
@@ -119,13 +125,26 @@ class MatchViewSet(viewsets.ModelViewSet):
                         return Response(response, status=status.HTTP_400_BAD_REQUEST)
                     else:
                         if is_og == 'True':
+                            if not assistant_id == 'None':
+                                response = {'message': 'own goals can not be assisted'}
+                                return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
                             scorers_team = scorer.team
                             if scorers_team == match.host_team:
                                 team = match.guest_team
+                                match.guest_team_goal_count += 1
+                                match.save()
                             else:
                                 team = match.host_team
+                                match.host_team_goal_count += 1
+                                match.save()
                         elif is_og == 'False':
                             team = scorer.team
+                            if team == match.host_team:
+                                match.host_team_goal_count += 1
+                                match.save()
+                            elif team == match.guest_team:
+                                match.guest_team_goal_count += 1
+                                match.save()
                         else:
                             response = {'message': 'invalid fields or data'}
                             return Response(response, status=status.HTTP_400_BAD_REQUEST)
@@ -209,7 +228,27 @@ class MatchViewSet(viewsets.ModelViewSet):
             match = Match.objects.get(id=pk)
             match.status = 'H'
             match.save()
-            # table should be updated
+            host_team_tournament_stats = TeamTournamentStats.objects.get(tournament_season=match.tournament_season,
+                                                                         team=match.host_team)
+            guest_team_tournament_stats = TeamTournamentStats.objects.get(tournament_season=match.tournament_season,
+                                                                          team=match.guest_team)
+            if match.host_team_goal_count > match.guest_team_goal_count:
+                host_team_tournament_stats.points += 3
+                host_team_tournament_stats.wins += 1
+                guest_team_tournament_stats.loses += 1
+            elif match.host_team_goal_count < match.guest_team_goal_count:
+                guest_team_tournament_stats.wins += 1
+                guest_team_tournament_stats.points += 3
+                host_team_tournament_stats.loses += 1
+            elif match.host_team_goal_count == match.guest_team_goal_count:
+                guest_team_tournament_stats.draws += 1
+                host_team_tournament_stats.draws += 1
+                guest_team_tournament_stats.points += 1
+                host_team_tournament_stats.points += 1
+            host_team_tournament_stats.goals_scored += match.host_team_goal_count
+            host_team_tournament_stats.goals_received += match.guest_team_goal_count
+            host_team_tournament_stats.save()
+            guest_team_tournament_stats.save()
             response = {'message': 'match finished successfully'}
             return Response(response, status=status.HTTP_200_OK)
 
