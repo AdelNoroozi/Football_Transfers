@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from ai.algorithms import calculater_player_score
 from stats_api.filters import PlayerMatchStatsFilter, TeamMatchStatsFilter, GoalFilter, TeamTournamentStatsFilter
-from stats_api.models import Team, Player, Transfer, Popularities, Match
+from stats_api.models import Team, Player, Popularities, Match
 from stats_api.serializers import *
 
 
@@ -19,6 +19,7 @@ from stats_api.serializers import *
 # class UserViewSet(viewsets.ModelViewSet):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
+from transfer.models import Transfer
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -457,13 +458,6 @@ class TeamTournamentStatsView(mixins.ListModelMixin,
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = TeamTournamentStatsFilter
     ordering_fields = ['points', 'wins', 'loses', 'draws', 'goals_scored', 'goals_received']
-
-
-class TransferViewSet(viewsets.ModelViewSet):
-    queryset = Transfer.objects.all()
-    serializer_class = TransferSerializer
-
-    # permission_classes = (IsAdminUser,)
 
 
 class PopularitiesViewSet(viewsets.ModelViewSet):
