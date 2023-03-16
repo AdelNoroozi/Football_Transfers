@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import Avg
 
 from accounts.models import User
+from articles.models import Tag
 from utils.models import Country, City
 
 
@@ -16,6 +17,7 @@ class Tournament(models.Model):
     host = models.ForeignKey(Country, on_delete=models.RESTRICT, related_name='tournaments')
     type = models.CharField(max_length=10, choices=TOURNAMENT_TYPES)
     name = models.CharField(max_length=10)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.name
@@ -27,6 +29,7 @@ class TournamentSeason(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     no_of_teams = models.IntegerField()
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return f'{self.tournament.name} - {self.season}'
@@ -36,6 +39,7 @@ class Manager(models.Model):
     name = models.CharField(max_length=50)
     nationality = models.ForeignKey(Country, on_delete=models.RESTRICT, related_name='managers')
     picture = models.ImageField(upload_to='pictures/', null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.name
@@ -45,6 +49,7 @@ class Stadium(models.Model):
     name = models.CharField(max_length=20)
     city = models.ForeignKey(City, on_delete=models.RESTRICT, related_name='stadiums')
     capacity = models.IntegerField()
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.name
@@ -60,6 +65,7 @@ class Team(models.Model):
     country = models.ForeignKey(Country, on_delete=models.RESTRICT, related_name='teams')
     manager = models.ForeignKey(Manager, on_delete=models.PROTECT, related_name='teams')
     tournaments = models.ManyToManyField(Tournament)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.name
@@ -90,6 +96,7 @@ class Referee(models.Model):
     name = models.CharField(max_length=50)
     nationality = models.ForeignKey(Country, on_delete=models.RESTRICT, related_name='referees')
     picture = models.ImageField(upload_to='pictures/', null=True, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.name
@@ -110,6 +117,7 @@ class Match(models.Model):
     stadium = models.ForeignKey(Stadium, on_delete=models.RESTRICT, related_name='matches')
     main_referee = models.ForeignKey(Referee, on_delete=models.RESTRICT, related_name='matches')
     assist_referees = models.ManyToManyField(Referee)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return f'{self.host_team.name} - {self.guest_team.name} ({self.tournament_season.tournament.name} {self.tournament_season.season} - {self.round}) '
@@ -139,6 +147,7 @@ class Player(models.Model):
     # market_value = models.DecimalField(max_digits=9, decimal_places=2)
     picture = models.ImageField(upload_to='pictures/', null=True, blank=True)
     birth_date = models.DateField()
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def get_age(self):
         today = date.today()
@@ -283,6 +292,7 @@ class Transfer(models.Model):
     destination_club = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='in_transfers')
     date = models.DateField()
     cost = models.DecimalField(max_digits=11, decimal_places=2)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return '{0} from {1} to {2}'.format(self.player.name, self.former_club.name, self.destination_club.name)
