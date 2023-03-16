@@ -162,6 +162,9 @@ class GoalType(models.Model):
     type = models.CharField(max_length=20)
     ratio = models.DecimalField(max_digits=3, decimal_places=2, default=1.00)
 
+    def __str__(self):
+        return self.type
+
 
 class Goal(models.Model):
     AREAS = (('LF', 'left foot'),
