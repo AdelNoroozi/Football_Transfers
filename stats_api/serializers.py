@@ -191,6 +191,24 @@ class TeamSerializer(serializers.ModelSerializer):
             'no_of_scores', 'avg_score', 'players', 'in_transfers', 'out_transfers')
 
 
+class TournamentSeasonMiniSerializer(serializers.ModelSerializer):
+    tournament = serializers.CharField(source='tournament.name')
+
+    class Meta:
+        model = TournamentSeason
+        fields = ('id', 'tournament', 'season')
+
+
+class TeamTournamentStatsSerializer(serializers.ModelSerializer):
+    team = TeamMiniSerializer(many=False)
+    tournament_season = TournamentSeasonMiniSerializer(many=False)
+
+    class Meta:
+        model = TeamTournamentStats
+        fields = (
+            'id', 'team', 'tournament_season', 'points', 'wins', 'loses', 'draws', 'goals_scored', 'goals_received')
+
+
 class PopularitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Popularities

@@ -226,6 +226,9 @@ class MatchViewSet(viewsets.ModelViewSet):
             return Response(response, status=status.HTTP_404_NOT_FOUND)
         else:
             match = Match.objects.get(id=pk)
+            if match.status == 'H':
+                response = {'message': 'match is already finished'}
+                return Response(response, status=status.HTTP_406_NOT_ACCEPTABLE)
             match.status = 'H'
             match.save()
             host_team_tournament_stats = TeamTournamentStats.objects.get(tournament_season=match.tournament_season,
@@ -247,6 +250,8 @@ class MatchViewSet(viewsets.ModelViewSet):
                 host_team_tournament_stats.points += 1
             host_team_tournament_stats.goals_scored += match.host_team_goal_count
             host_team_tournament_stats.goals_received += match.guest_team_goal_count
+            guest_team_tournament_stats.goals_scored += match.guest_team_goal_count
+            guest_team_tournament_stats.goals_received += match.host_team_goal_count
             host_team_tournament_stats.save()
             guest_team_tournament_stats.save()
             response = {'message': 'match finished successfully'}
@@ -443,6 +448,12 @@ class GoalListView(mixins.ListModelMixin,
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_class = GoalFilter
     ordering_fields = ['time']
+
+
+class TeamTournamentStatsView(mixins.ListModelMixin,
+                              GenericViewSet):
+    queryset = TeamTournamentStats.objects.all().order_by('points')
+    serializer_class = TeamTournamentStatsSerializer
 
 
 class TransferViewSet(viewsets.ModelViewSet):
