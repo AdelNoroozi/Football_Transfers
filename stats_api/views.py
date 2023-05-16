@@ -11,15 +11,15 @@ from rest_framework.viewsets import GenericViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from ai.algorithms import calculater_player_score
 from stats_api.filters import PlayerMatchStatsFilter, TeamMatchStatsFilter, GoalFilter, TeamTournamentStatsFilter
-from stats_api.models import Team, Player, Popularities, Match
+from stats_api.models import Team, Player, Popularity, Match
 from stats_api.serializers import *
-
 
 #
 # class UserViewSet(viewsets.ModelViewSet):
 #     queryset = User.objects.all()
 #     serializer_class = UserSerializer
 from transfer.models import Transfer
+from transfer.serializers import TransferSerializer
 
 
 class TeamViewSet(viewsets.ModelViewSet):
@@ -37,14 +37,14 @@ class TeamViewSet(viewsets.ModelViewSet):
             in_score = request.data['in_score']
             user = request.user
             try:
-                score = Popularities.objects.get(user=user.id, team=team.id)
+                score = Popularity.objects.get(user=user.id, team=team.id)
                 score.popularity = in_score
                 score.save()
                 serializer = PopularitiesSerializer(score, many=False)
                 response = {'score updated successfully'}
                 return Response(response, status=status.HTTP_200_OK)
             except:
-                score = Popularities.objects.create(user=user, team=team, popularity=in_score)
+                score = Popularity.objects.create(user=user, team=team, popularity=in_score)
                 serializer = PopularitiesSerializer(score, many=False)
                 response = {'score created successfully'}
                 return Response(response, status=status.HTTP_200_OK)
@@ -461,7 +461,7 @@ class TeamTournamentStatsView(mixins.ListModelMixin,
 
 
 class PopularitiesViewSet(viewsets.ModelViewSet):
-    queryset = Popularities.objects.all()
+    queryset = Popularity.objects.all()
     serializer_class = PopularitiesSerializer
     authentication_classes = (TokenAuthentication,)
 

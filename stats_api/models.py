@@ -71,12 +71,12 @@ class Team(models.Model):
         return self.name
 
     def no_of_scores(self):
-        scores = Popularities.objects.filter(team=self)
+        scores = Popularity.objects.filter(team=self)
         return len(scores)
 
     def avg_score(self):
         sum = 0
-        scores = Popularities.objects.filter(team=self)
+        scores = Popularity.objects.filter(team=self)
         for score in scores:
             sum += score.popularity
         if len(scores) > 0:
@@ -289,7 +289,7 @@ class TeamTournamentStats(models.Model):
         return f'{self.team.name} - {self.tournament_season.tournament.name} - {self.tournament_season.season}'
 
 
-class Popularities(models.Model):
+class Popularity(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     popularity = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])

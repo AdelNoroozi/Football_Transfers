@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from stats_api.serializers import TransferSerializer
 from transfer.models import Transfer
+from transfer.serializers import TransferSerializer
 
 
 class TransferViewSet(viewsets.ModelViewSet):
