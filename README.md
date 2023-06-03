@@ -26,11 +26,11 @@ This is a project for recording football stats. It records all kind of data abou
   
   ● Datas about match events:
   
-    ● Goals
+   ●● Goals
     
-    ● Substitutions
+   ●● Substitutions
     
-    ● Bookings
+   ●● Bookings
     
 ● Records all information about players
 
