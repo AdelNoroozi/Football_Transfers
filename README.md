@@ -4,8 +4,5 @@ This is a project for recording football stats. It records all kind of data abou
 
 # Tools
 <img src="https://raw.githubusercontent.com/AdelNoroozi/Football_Transfers/main/resources/python-icon.png" heigth="32" >
-Python
 <img src="https://raw.githubusercontent.com/AdelNoroozi/Football_Transfers/main/resources/django-icon.png" heigth="32" >
-Django
 <img src="https://raw.githubusercontent.com/AdelNoroozi/Football_Transfers/main/resources/django-rest-icon.png" heigth="32" >
-Django REST
